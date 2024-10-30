@@ -1,7 +1,54 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { hightlightsSlides } from '../constants';
+import gsap from 'gsap';
 
 const VideoCarousel = () => {
+  const videoRef = useRef([]);
+  const videoSpanRef = useRef([]);
+  const videoDivRef = useRef([]);
+
+  const [video, setVideo] = useState({
+    isEnd:false, 
+    startPlay: false,
+    videoId: 0,
+    isLastVideo: false,
+    isPlaying: false,
+  })
+
+const [loadedData, setLoadedData] = useState([]);
+
+  const { isEnd, isLastVideo, videoId, isPlaying, startPlay } = video;
+
+ useEffect(() => {
+    if(loadedData.length > 3) {
+      if(!isPlaying) {
+        videoref.current[videoId].pause();
+      } else {
+        startPlay && videoRef.current[videoId].play();
+      }
+    }
+ }, [startPlay, videoId, isPlaying, loadedData])
+ 
+  
+
+  useEffect(()=> {
+    const currentProgress = 0;
+    let span = videoSpanRef.current;
+
+    if(span[videoId]) {
+      //animate the progress of the video
+      let anim = gsap.to(span[videoId], {
+        onUpdate: () => {
+
+        },
+
+        onComplete: () => {
+
+        },
+      })
+    }
+  }, [videoId, startPlay])
+
   return (
     <>
     <div className="flex items-center">
@@ -14,6 +61,12 @@ const VideoCarousel = () => {
           playsInline={true}
           preload='auto'
           muted
+          ref={(el)=> (videoRef.current[i] = el)}
+          onPlay={() => {
+            setVideo((prevVideo)=> ({
+              ...prevVideo, isPlaying: true
+            }))
+          }}
           >
             <source src={list.video} type='video/mp4' />
           </video>
@@ -21,7 +74,7 @@ const VideoCarousel = () => {
 
          <div className="absolute top-12 left-[5%] z-10">
           {list.textLists.map((text) => (
-            <p key={text}>
+            <p key={text} className='md:text-2xl text-xl font-medium'>
               {text}
             </p>
           ))}
@@ -29,6 +82,20 @@ const VideoCarousel = () => {
         </div>
         </div>
       ))}
+    </div>
+
+    <div className="relative flex-center mt-10">
+      <div className="flex-center py-5 px-7 bg-gray-300 backdrop-blur rounded-full">
+        {videoRef.current.map((_, i) => (
+          <span
+          key={i}
+          ref={(el)=> (videoDivRef.current[i] = el)}
+          className='mx-2 w-3 h-3 bg-gray-200 rounded-full relative cursor-pointer'
+          >
+
+          </span>
+        ))}
+      </div>
     </div>
     </>
   )
